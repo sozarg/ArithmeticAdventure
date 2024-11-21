@@ -1,8 +1,15 @@
 import random
+import pygame
 
+from Menu import *
+
+pygame.init()
+
+pygame.quit()
+# Lectura del CSV
 def obtener_lista_niveles() -> dict:
-    with open("problemas.csv", "r", encoding = "utf8") as problemas:
-        problemas.readline()
+    with open("problemas.csv", "r", encoding="utf8") as problemas:
+        problemas.readline()  # Ignorar la primera línea del archivo
         keys = {
             "1": [[], []],
             "2": [[], []],
@@ -19,7 +26,5 @@ def obtener_lista_niveles() -> dict:
             keys[dificultad][1].append(resultado)
     return keys
 
-#funcion | dentro del nivel seleccionar un ejercicio random
 
-resultado = obtener_lista_niveles()
-print(resultado)
+
