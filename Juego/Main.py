@@ -23,7 +23,4 @@ def obtener_lista_niveles() -> dict:
             keys[dificultad][1].append(resultado)
     return keys
 
-#
-#
-#asdasd
-#asdasdasdsa
+# 3159694194
