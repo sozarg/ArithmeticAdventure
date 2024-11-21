@@ -3,9 +3,6 @@ import pygame
 
 from Menu import *
 
-pygame.init()
-
-pygame.quit()
 # Lectura del CSV
 def obtener_lista_niveles() -> dict:
     with open("problemas.csv", "r", encoding="utf8") as problemas:
@@ -26,5 +23,6 @@ def obtener_lista_niveles() -> dict:
             keys[dificultad][1].append(resultado)
     return keys
 
-#holaaaaaa
-
+#
+#
+#asdasd
