@@ -14,6 +14,14 @@ def obtener_lista_niveles() -> dict:
             keys[dificultad][1].append(resultado)
     return keys
 
+def medir_tiempo_respuesta(funcion):
+    inicio = time.time()
+    resultado = funcion()
+    fin = time.time()
+    tiempo_transcurrido = fin - inicio
+
+    return resultado, tiempo_transcurrido
+
 def obtener_respuesta_usuario() -> int:
     while True:
         try:
@@ -21,41 +29,59 @@ def obtener_respuesta_usuario() -> int:
         except ValueError:
             print("Error, número no ingresado.")
 
+def ecuacion_correcta(vidas: int, puntuacion: int, control: int, cantidad_preguntas: int) -> tuple:
+    puntuacion += 1
+    control += 1
+    if control < cantidad_preguntas:
+        print(f"¡Correcto! Te quedan {cantidad_preguntas - control} preguntas.")
+    return vidas, puntuacion, control
+
+def ecuacion_incorrecta(vidas: int) -> int:
+    vidas -= 1
+    if vidas > 0:
+        print(f"Te quedan {vidas} vidas.")
+    else:
+        print("Te quedaste sin vidas.")
+    return vidas
+
 def hacer_pregunta(ecuaciones, resultados) -> bool:
     indice = random.randint(0, len(ecuaciones) - 1)
     ecuacion_actual = ecuaciones[indice]
     resultado_actual = resultados[indice]
-    
-    print(f"Ecuación: {ecuacion_actual}")
-    respuesta_usuario = obtener_respuesta_usuario()
 
+    print(f"Ecuación: {ecuacion_actual}")
+    respuesta_usuario, tiempo_transcurrido = medir_tiempo_respuesta(obtener_respuesta_usuario)
+    
+    if tiempo_transcurrido > 10:
+        print(f"¡Perdiste! Sobrepasaste los 10 segundos. La respuesta era: {resultado_actual}.")
+        return False
     if respuesta_usuario == resultado_actual:
-        print("¡Correcto!")
         return True
     else:
         print(f"Incorrecto. La respuesta correcta era {resultado_actual}")
         return False
-
 
 def jugar_nivel(nivel, niveles, vidas: int, puntuacion: int) -> tuple:
     ecuaciones = niveles[str(nivel)][0]
     resultados = niveles[str(nivel)][1]
     control = 0
     cantidad_preguntas = 5
-
     while control < cantidad_preguntas and vidas > 0:
         respuesta_correcta = hacer_pregunta(ecuaciones, resultados)
+        
         if respuesta_correcta:
-            puntuacion += 1
-            control += 1
+            vidas, puntuacion, control = ecuacion_correcta(vidas, puntuacion, control, cantidad_preguntas)
         else:
-            vidas -= 1 
-            if vidas > 0:
-                print(f"Incorrecto D: | {vidas} vidas restantes")
-            else:
-                print("Te quedaste sin vidas. Intenta nuevamente.")
+            vidas = ecuacion_incorrecta(vidas)
 
-    nivel_completado = control == cantidad_preguntas
+        if vidas == 0:
+            break
+
+    if control == cantidad_preguntas:
+        nivel_completado = True
+    else:
+        nivel_completado = False
+
     return nivel_completado, vidas, puntuacion
 
 def iniciar_juego():
@@ -64,7 +90,7 @@ def iniciar_juego():
     puntuacion = 0
 
     for nivel_actual in range(1, 6):
-        print(f"\n--- Nivel {nivel_actual} ---")
+        print(f"\n--- Nivel {nivel_actual} --- \nTenes 10 segundos para responder.")
         nivel_completado, vidas, puntuacion = jugar_nivel(nivel_actual, niveles, vidas, puntuacion)
 
         if nivel_completado:
