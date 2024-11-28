@@ -1,97 +1,79 @@
 import random
-import time
+from modulos.puntaje import guardar_puntaje
+from modulos.niveles import obtener_lista_niveles
+from modulos.respuestas import ecuacion_correcta, ecuacion_incorrecta, hacer_pregunta
 
-def obtener_lista_niveles() -> dict:    
-    with open("problemas.csv", "r", encoding="utf8") as problemas:
-        problemas.readline()
-        keys = {str(i): [[], []] for i in range(1, 6)}
+def jugar_nivel(nivel, niveles, vidas: int, puntuacion: int, comodines: dict) -> tuple:
+    """
+    Permite al jugador resolver un conjunto de ecuaciones correspondientes a un nivel del juego.
 
-        for linea in problemas:
-            dificultad, ecuacion, resultado = linea.split(",")
-            dificultad = dificultad.strip()
-            resultado = int(resultado.strip())
-            keys[dificultad][0].append(ecuacion.strip())
-            keys[dificultad][1].append(resultado)
-    return keys
+    Args:
+        nivel (int): El nivel actual del juego.
+        niveles (dict): Diccionario con los niveles y sus respectivas ecuaciones y resultados.
+        vidas (int): Cantidad de vidas restantes del jugador.
+        puntuacion (int): Puntuación acumulada del jugador.
+        comodines (dict): Diccionario con los comodines disponibles del jugador.
 
-def medir_tiempo_respuesta(funcion):
-    inicio = time.time()
-    resultado = funcion()
-    fin = time.time()
-    tiempo_transcurrido = fin - inicio
-
-    return resultado, tiempo_transcurrido
-
-def obtener_respuesta_usuario() -> int:
-    while True:
-        try:
-            return int(input("Tu respuesta: "))
-        except ValueError:
-            print("Error, número no ingresado.")
-
-def ecuacion_correcta(vidas: int, puntuacion: int, control: int, cantidad_preguntas: int) -> tuple:
-    puntuacion += 1
-    control += 1
-    if control < cantidad_preguntas:
-        print(f"¡Correcto! Te quedan {cantidad_preguntas - control} preguntas.")
-    return vidas, puntuacion, control
-
-def ecuacion_incorrecta(vidas: int) -> int:
-    vidas -= 1
-    if vidas > 0:
-        print(f"Te quedan {vidas} vidas.")
-    else:
-        print("Te quedaste sin vidas.")
-    return vidas
-
-def hacer_pregunta(ecuaciones, resultados) -> bool:
-    indice = random.randint(0, len(ecuaciones) - 1)
-    ecuacion_actual = ecuaciones[indice]
-    resultado_actual = resultados[indice]
-
-    print(f"Ecuación: {ecuacion_actual}")
-    respuesta_usuario, tiempo_transcurrido = medir_tiempo_respuesta(obtener_respuesta_usuario)
-    
-    if tiempo_transcurrido > 10:
-        print(f"¡Perdiste! Sobrepasaste los 10 segundos. La respuesta era: {resultado_actual}.")
-        return False
-    if respuesta_usuario == resultado_actual:
-        return True
-    else:
-        print(f"Incorrecto. La respuesta correcta era {resultado_actual}")
-        return False
-
-def jugar_nivel(nivel, niveles, vidas: int, puntuacion: int) -> tuple:
+    Returns:
+        tuple: Un tupla con nivel completado (bool), vidas restantes (int) y puntuación acumulada (int).
+    """
     ecuaciones = niveles[str(nivel)][0]
     resultados = niveles[str(nivel)][1]
     control = 0
     cantidad_preguntas = 5
+    
+    indices_aleatorios = random.sample(range(len(ecuaciones)), len(ecuaciones))
+    ecuaciones_mezcladas = []
+    resultados_mezclados = []
+
+    for i in indices_aleatorios:
+        ecuaciones_mezcladas.append(ecuaciones[i])
+        resultados_mezclados.append(resultados[i])
+    
     while control < cantidad_preguntas and vidas > 0:
-        respuesta_correcta = hacer_pregunta(ecuaciones, resultados)
+        ecuacion_actual = ecuaciones_mezcladas[control]
+        resultado_actual = resultados_mezclados[control]
         
-        if respuesta_correcta:
+        respuesta, tiempo_transcurrido = hacer_pregunta(ecuacion_actual, resultado_actual, comodines)
+        
+        if respuesta == "ganar":
+            control += 1
+            puntuacion += 1
+            continue
+        elif respuesta == "sumar_vida":
+            vidas += 1
+            print(f"Ahora tienes {vidas} vidas.")
+            continue
+        elif respuesta:
             vidas, puntuacion, control = ecuacion_correcta(vidas, puntuacion, control, cantidad_preguntas)
         else:
             vidas = ecuacion_incorrecta(vidas)
+            ecuaciones_mezcladas.pop(control)
+            resultados_mezclados.pop(control)
 
         if vidas == 0:
             break
 
-    if control == cantidad_preguntas:
-        nivel_completado = True
-    else:
-        nivel_completado = False
+    nivel_completado = control == cantidad_preguntas
 
     return nivel_completado, vidas, puntuacion
 
 def iniciar_juego():
+    """
+    Inicia el juego solicitando el nombre del jugador y gestionando los niveles.
+
+    Returns:
+        None
+    """
+    nombre_jugador = input("Por favor, ingresa tu nombre: ")
     niveles = obtener_lista_niveles()
     vidas = 3
     puntuacion = 0
+    comodines = {"joker1": 1, "joker2": 1, "joker3": 1}
 
     for nivel_actual in range(1, 6):
         print(f"\n--- Nivel {nivel_actual} --- \nTenes 10 segundos para responder.")
-        nivel_completado, vidas, puntuacion = jugar_nivel(nivel_actual, niveles, vidas, puntuacion)
+        nivel_completado, vidas, puntuacion = jugar_nivel(nivel_actual, niveles, vidas, puntuacion, comodines)
 
         if nivel_completado:
             print(f"¡Has completado el nivel {nivel_actual}!")
@@ -100,10 +82,17 @@ def iniciar_juego():
             break
 
     print(f"\nJuego terminado. Puntuación final: {puntuacion} puntos.")
+    guardar_puntaje(nombre_jugador, puntuacion)
 
 def mostrar_menu():
+    """
+    Muestra el menú principal del juego y permite al jugador iniciar o salir del juego.
+
+    Returns:
+        None
+    """
     while True:
-        print("¡Bienvenido a Arithmetic Adventure!")
+        print("\n¡Bienvenido a Arithmetic Adventure!")
         print("1. Iniciar juego")
         print("2. Salir del juego")
 
@@ -112,7 +101,7 @@ def mostrar_menu():
             if opcion == 1:
                 iniciar_juego()
             elif opcion == 2:
-                print("¡Gracias por jugar!")
+                print("Gracias por jugar.")
                 break
             else:
                 print("Por favor, selecciona una opción válida.")
