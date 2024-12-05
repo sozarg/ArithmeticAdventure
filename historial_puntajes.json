@@ -1,47 +1,47 @@
 [
     {
-        "nombre": "Mateo",
-        "puntaje": 16,
-        "fecha": "2024-11-27 22:13:08"
+        "nombre": "hola",
+        "puntaje": 4,
+        "fecha": "2024-12-04 02:42:04"
     },
     {
-        "nombre": "tute",
-        "puntaje": 6,
-        "fecha": "2024-11-27 22:36:26"
-    },
-    {
-        "nombre": "mss",
-        "puntaje": 1,
-        "fecha": "2024-11-27 23:07:36"
-    },
-    {
-        "nombre": "1",
-        "puntaje": 2,
-        "fecha": "2024-11-27 23:08:44"
+        "nombre": "chau",
+        "puntaje": 3,
+        "fecha": "2024-12-04 02:51:10"
     },
     {
         "nombre": "asd",
+        "puntaje": 5,
+        "fecha": "2024-12-05 02:12:37"
+    },
+    {
+        "nombre": "kl}",
         "puntaje": 0,
-        "fecha": "2024-11-27 23:27:32"
+        "fecha": "2024-12-05 09:22:01"
     },
     {
-        "nombre": "asd",
+        "nombre": "klñ",
         "puntaje": 1,
-        "fecha": "2024-11-27 23:28:12"
+        "fecha": "2024-12-05 09:22:09"
     },
     {
-        "nombre": "asd",
+        "nombre": "mateo8",
+        "puntaje": 25,
+        "fecha": "2024-12-05 10:23:04"
+    },
+    {
+        "nombre": "gf",
         "puntaje": 0,
-        "fecha": "2024-11-27 23:31:19"
+        "fecha": "2024-12-05 10:23:25"
     },
     {
-        "nombre": "rr",
-        "puntaje": 2,
-        "fecha": "2024-11-28 00:16:47"
+        "nombre": "prueba1",
+        "puntaje": 25,
+        "fecha": "2024-12-05 10:56:19"
     },
     {
-        "nombre": "checkeo puntaje",
-        "puntaje": 7,
-        "fecha": "2024-11-28 01:37:30"
+        "nombre": "perdi",
+        "puntaje": 0,
+        "fecha": "2024-12-05 10:56:50"
     }
 ]
